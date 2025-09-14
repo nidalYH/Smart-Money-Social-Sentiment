@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  test:
+    build: .
+    command: python -m pytest tests/ -v --cov=app --cov-report=html
+    environment:
+      - DATABASE_URL=sqlite:///./smartmoney_test.db
+      - REDIS_URL=redis://redis:6379
+      - TEST_MODE=true
+    volumes:
+      - .:/app
+      - ./coverage:/app/coverage
+    depends_on:
+      - redis
+    restart: "no"
+
+  lint:
+    build: .
+    command: flake8 app/ tests/ && black --check app/ tests/ && isort --check-only app/ tests/
+    volumes:
+      - .:/app
+    restart: "no"
+
+  security:
+    build: .
+    command: safety check && bandit -r app/ && semgrep --config=auto app/
+    volumes:
+      - .:/app
+    restart: "no"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped

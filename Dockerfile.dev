@@ -1,0 +1,36 @@
+# Smart Money Trading System - Development Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements-dev.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# Copy application code
+COPY . .
+
+# Create logs directory
+RUN mkdir -p logs
+
+# Create non-root user
+RUN useradd -m -u 1000 trader && chown -R trader:trader /app
+USER trader
+
+# Expose port
+EXPOSE 8000
+
+# Start command for development
+CMD ["python", "complete_trading_system.py"]

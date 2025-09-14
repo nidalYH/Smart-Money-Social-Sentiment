@@ -1,0 +1,32 @@
+global:
+  smtp_smarthost: 'localhost:587'
+  smtp_from: 'alerts@smartmoney.com'
+
+route:
+  group_by: ['alertname']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 1h
+  receiver: 'web.hook'
+
+receivers:
+- name: 'web.hook'
+  webhook_configs:
+  - url: 'http://localhost:5001/'
+
+- name: 'telegram'
+  webhook_configs:
+  - url: 'http://smartmoney:8000/api/alerts/telegram'
+    send_resolved: true
+
+- name: 'discord'
+  webhook_configs:
+  - url: 'http://smartmoney:8000/api/alerts/discord'
+    send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']

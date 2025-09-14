@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Money Trading System - Dashboard Unificado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .nav-pills .nav-link {
+            border-radius: 15px;
+            margin: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+        }
+        .nav-pills .nav-link:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-online { background-color: #28a745; }
+        .status-offline { background-color: #dc3545; }
+        .status-warning { background-color: #ffc107; }
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .alert-custom {
+            border-radius: 15px;
+            border: none;
+            padding: 15px 20px;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .whale-activity {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .signal-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .signal-buy { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .signal-sell { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .signal-hold { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="container-fluid">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="main-card p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h1 class="mb-0">
+                                    <i class="fas fa-chart-line text-primary me-3"></i>
+                                    Smart Money Trading System
+                                </h1>
+                                <p class="text-muted mb-0">Dashboard Unificado - Análisis en Tiempo Real</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="d-flex align-items-center justify-content-end">
+                                    <span class="status-indicator status-online"></span>
+                                    <span class="me-3">Sistema Activo</span>
+                                    <button class="btn btn-primary-custom btn-custom" onclick="refreshData()">
+                                        <i class="fas fa-sync-alt me-2"></i>Actualizar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navegación por Pestañas -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="main-card p-4">
+                        <ul class="nav nav-pills justify-content-center" id="dashboardTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" data-bs-target="#overview" type="button" role="tab">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Resumen
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="trading-tab" data-bs-toggle="pill" data-bs-target="#trading" type="button" role="tab">
+                                    <i class="fas fa-chart-line me-2"></i>Trading
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="whales-tab" data-bs-toggle="pill" data-bs-target="#whales" type="button" role="tab">
+                                    <i class="fas fa-fish me-2"></i>Ballenas
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="sentiment-tab" data-bs-toggle="pill" data-bs-target="#sentiment" type="button" role="tab">
+                                    <i class="fas fa-heart me-2"></i>Sentimiento
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="signals-tab" data-bs-toggle="pill" data-bs-target="#signals" type="button" role="tab">
+                                    <i class="fas fa-bell me-2"></i>Señales
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="positions-tab" data-bs-toggle="pill" data-bs-target="#positions" type="button" role="tab">
+                                    <i class="fas fa-wallet me-2"></i>Posiciones
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="config-tab" data-bs-toggle="pill" data-bs-target="#config" type="button" role="tab">
+                                    <i class="fas fa-cog me-2"></i>Configuración
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Contenido de las Pestañas -->
+                        <div class="tab-content" id="dashboardTabsContent">
+                            <!-- Pestaña Resumen -->
+                            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                <div class="row">
+                                    <!-- Métricas Principales -->
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="totalValue">$0.00</div>
+                                            <div class="metric-label">Valor Total</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="profitLoss">+$0.00</div>
+                                            <div class="metric-label">P&L</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="activePositions">0</div>
+                                            <div class="metric-label">Posiciones Activas</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="metric-card">
+                                            <div class="metric-value" id="winRate">0%</div>
+                                            <div class="metric-label">Tasa de Éxito</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Gráficos Principales -->
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="chart-container">
+                                            <h5><i class="fas fa-chart-area me-2"></i>Precio y Volumen</h5>
+                                            <canvas id="priceVolumeChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="chart-container">
+                                            <h5><i class="fas fa-pie-chart me-2"></i>Distribución de Activos</h5>
+                                            <canvas id="assetDistributionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Actividad Reciente -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-container">
+                                            <h5><i class="fas fa-history me-2"></i>Actividad Reciente</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Timestamp</th>
+                                                            <th>Tipo</th>
+                                                            <th>Activo</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Precio</th>
+                                                            <th>Estado</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="recentActivity">
+                                                        <tr>
+                                                            <td colspan="6" class="text-center">Cargando actividad...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Trading -->
+                            <div class="tab-pane fade" id="trading" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="chart-container">
+                                            <h5><i class="fas fa-chart-candlestick me-2"></i>Gráfico de Trading</h5>
+                                            <canvas id="tradingChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="config-section">
+                                            <h5><i class="fas fa-tools me-2"></i>Controles de Trading</h5>
+                                            <div class="mb-3">
+                                                <label class="form-label">Activo</label>
+                                                <select class="form-select" id="tradingAsset">
+                                                    <option value="BTCUSDT">BTC/USDT</option>
+                                                    <option value="ETHUSDT">ETH/USDT</option>
+                                                    <option value="ADAUSDT">ADA/USDT</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Intervalo</label>
+                                                <select class="form-select" id="tradingInterval">
+                                                    <option value="1m">1 Minuto</option>
+                                                    <option value="5m">5 Minutos</option>
+                                                    <option value="15m">15 Minutos</option>
+                                                    <option value="1h">1 Hora</option>
+                                                </select>
+                                            </div>
+                                            <button class="btn btn-primary-custom btn-custom w-100" onclick="startTrading()">
+                                                <i class="fas fa-play me-2"></i>Iniciar Trading
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Ballenas -->
+                            <div class="tab-pane fade" id="whales" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-container">
+                                            <h5><i class="fas fa-fish me-2"></i>Actividad de Ballenas</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Wallet</th>
+                                                            <th>Activo</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Valor USD</th>
+                                                            <th>Timestamp</th>
+                                                            <th>Tipo</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="whaleActivity">
+                                                        <tr>
+                                                            <td colspan="6" class="text-center">Cargando actividad de ballenas...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Sentimiento -->
+                            <div class="tab-pane fade" id="sentiment" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="chart-container">
+                                            <h5><i class="fas fa-heart me-2"></i>Análisis de Sentimiento</h5>
+                                            <canvas id="sentimentChart"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="table-container">
+                                            <h5><i class="fas fa-comments me-2"></i>Menciones Recientes</h5>
+                                            <div id="sentimentMentions">
+                                                <div class="text-center">Cargando menciones...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Señales -->
+                            <div class="tab-pane fade" id="signals" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-container">
+                                            <h5><i class="fas fa-bell me-2"></i>Señales de Trading</h5>
+                                            <div id="signalsList">
+                                                <div class="text-center">Cargando señales...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Posiciones -->
+                            <div class="tab-pane fade" id="positions" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="table-container">
+                                            <h5><i class="fas fa-wallet me-2"></i>Posiciones Activas</h5>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Activo</th>
+                                                            <th>Tipo</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Precio Entrada</th>
+                                                            <th>Precio Actual</th>
+                                                            <th>P&L</th>
+                                                            <th>P&L %</th>
+                                                            <th>Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="positionsTable">
+                                                        <tr>
+                                                            <td colspan="8" class="text-center">Cargando posiciones...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pestaña Configuración -->
+                            <div class="tab-pane fade" id="config" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="config-section">
+                                            <h5><i class="fas fa-key me-2"></i>Configuración de Binance</h5>
+                                            <div class="mb-3">
+                                                <label class="form-label">API Key</label>
+                                                <input type="password" class="form-control" id="binanceApiKey" placeholder="Ingresa tu API Key">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Secret Key</label>
+                                                <input type="password" class="form-control" id="binanceSecretKey" placeholder="Ingresa tu Secret Key">
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="binanceTestnet" checked>
+                                                    <label class="form-check-label" for="binanceTestnet">
+                                                        Usar Testnet (Recomendado para pruebas)
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary-custom btn-custom w-100" onclick="saveBinanceConfig()">
+                                                <i class="fas fa-save me-2"></i>Guardar Configuración
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="config-section">
+                                            <h5><i class="fas fa-cog me-2"></i>Configuración del Sistema</h5>
+                                            <div class="mb-3">
+                                                <label class="form-label">Intervalo de Actualización (segundos)</label>
+                                                <input type="number" class="form-control" id="updateInterval" value="30" min="5" max="300">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Límite de Posiciones</label>
+                                                <input type="number" class="form-control" id="maxPositions" value="10" min="1" max="50">
+                                            </div>
+                                            <div class="mb-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="autoTrading" checked>
+                                                    <label class="form-check-label" for="autoTrading">
+                                                        Trading Automático
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary-custom btn-custom w-100" onclick="saveSystemConfig()">
+                                                <i class="fas fa-save me-2"></i>Guardar Configuración
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-2">Cargando datos...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let charts = {};
+        let updateInterval = 30000; // 30 segundos por defecto
+        let isTradingActive = false;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadInitialData();
+            startAutoUpdate();
+        });
+
+        // Inicializar gráficos
+        function initializeCharts() {
+            // Gráfico de Precio y Volumen
+            const priceVolumeCtx = document.getElementById('priceVolumeChart').getContext('2d');
+            charts.priceVolume = new Chart(priceVolumeCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Precio',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Volumen',
+                        data: [],
+                        borderColor: '#f093fb',
+                        backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Distribución de Activos
+            const assetDistributionCtx = document.getElementById('assetDistributionChart').getContext('2d');
+            charts.assetDistribution = new Chart(assetDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['BTC', 'ETH', 'ADA', 'Otros'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: ['#667eea', '#f093fb', '#4facfe', '#ffecd2']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Sentimiento
+            const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+            charts.sentiment = new Chart(sentimentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Positivo', 'Neutral', 'Negativo'],
+                    datasets: [{
+                        label: 'Sentimiento',
+                        data: [60, 25, 15],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cargar datos iniciales
+        async function loadInitialData() {
+            showLoading(true);
+            try {
+                await Promise.all([
+                    loadOverviewData(),
+                    loadTradingData(),
+                    loadWhaleData(),
+                    loadSentimentData(),
+                    loadSignalsData(),
+                    loadPositionsData()
+                ]);
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                showAlert('Error cargando datos: ' + error.message, 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Cargar datos del resumen
+        async function loadOverviewData() {
+            try {
+                const response = await fetch('/api/overview');
+                const data = await response.json();
+                
+                document.getElementById('totalValue').textContent = `$${data.totalValue || '0.00'}`;
+                document.getElementById('profitLoss').textContent = `$${data.profitLoss || '0.00'}`;
+                document.getElementById('activePositions').textContent = data.activePositions || '0';
+                document.getElementById('winRate').textContent = `${data.winRate || '0'}%`;
+                
+                // Actualizar gráfico de precio y volumen
+                if (data.priceData) {
+                    charts.priceVolume.data.labels = data.priceData.labels;
+                    charts.priceVolume.data.datasets[0].data = data.priceData.prices;
+                    charts.priceVolume.data.datasets[1].data = data.priceData.volumes;
+                    charts.priceVolume.update();
+                }
+                
+                // Actualizar tabla de actividad reciente
+                updateRecentActivityTable(data.recentActivity || []);
+                
+            } catch (error) {
+                console.error('Error cargando datos del resumen:', error);
+            }
+        }
+
+        // Cargar datos de trading
+        async function loadTradingData() {
+            try {
+                const response = await fetch('/api/trading/status');
+                const data = await response.json();
+                
+                // Actualizar gráfico de trading
+                if (data.chartData) {
+                    charts.trading = new Chart(document.getElementById('tradingChart').getContext('2d'), {
+                        type: 'candlestick',
+                        data: data.chartData,
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: false
+                                }
+                            }
+                        }
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error cargando datos de trading:', error);
+            }
+        }
+
+        // Cargar datos de ballenas
+        async function loadWhaleData() {
+            try {
+                const response = await fetch('/api/whales/activity');
+                const data = await response.json();
+                updateWhaleActivityTable(data.activities || []);
+            } catch (error) {
+                console.error('Error cargando datos de ballenas:', error);
+            }
+        }
+
+        // Cargar datos de sentimiento
+        async function loadSentimentData() {
+            try {
+                const response = await fetch('/api/sentiment/analysis');
+                const data = await response.json();
+                
+                if (data.sentimentData) {
+                    charts.sentiment.data.datasets[0].data = [
+                        data.sentimentData.positive || 0,
+                        data.sentimentData.neutral || 0,
+                        data.sentimentData.negative || 0
+                    ];
+                    charts.sentiment.update();
+                }
+                
+                updateSentimentMentions(data.mentions || []);
+            } catch (error) {
+                console.error('Error cargando datos de sentimiento:', error);
+            }
+        }
+
+        // Cargar datos de señales
+        async function loadSignalsData() {
+            try {
+                const response = await fetch('/api/signals/recent');
+                const data = await response.json();
+                updateSignalsList(data.signals || []);
+            } catch (error) {
+                console.error('Error cargando datos de señales:', error);
+            }
+        }
+
+        // Cargar datos de posiciones
+        async function loadPositionsData() {
+            try {
+                const response = await fetch('/api/positions/active');
+                const data = await response.json();
+                updatePositionsTable(data.positions || []);
+            } catch (error) {
+                console.error('Error cargando datos de posiciones:', error);
+            }
+        }
+
+        // Actualizar tabla de actividad reciente
+        function updateRecentActivityTable(activities) {
+            const tbody = document.getElementById('recentActivity');
+            tbody.innerHTML = '';
+            
+            if (activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay actividad reciente</td></tr>';
+                return;
+            }
+            
+            activities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${new Date(activity.timestamp).toLocaleString()}</td>
+                    <td><span class="badge bg-${activity.type === 'buy' ? 'success' : 'danger'}">${activity.type.toUpperCase()}</span></td>
+                    <td>${activity.asset}</td>
+                    <td>${activity.quantity}</td>
+                    <td>$${activity.price}</td>
+                    <td><span class="status-indicator status-${activity.status}"></span>${activity.status}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar tabla de actividad de ballenas
+        function updateWhaleActivityTable(activities) {
+            const tbody = document.getElementById('whaleActivity');
+            tbody.innerHTML = '';
+            
+            if (activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">No hay actividad de ballenas reciente</td></tr>';
+                return;
+            }
+            
+            activities.forEach(activity => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${activity.wallet.substring(0, 10)}...</td>
+                    <td>${activity.asset}</td>
+                    <td>${activity.quantity}</td>
+                    <td>$${activity.valueUsd}</td>
+                    <td>${new Date(activity.timestamp).toLocaleString()}</td>
+                    <td><span class="badge bg-${activity.type === 'buy' ? 'success' : 'danger'}">${activity.type.toUpperCase()}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar menciones de sentimiento
+        function updateSentimentMentions(mentions) {
+            const container = document.getElementById('sentimentMentions');
+            container.innerHTML = '';
+            
+            if (mentions.length === 0) {
+                container.innerHTML = '<div class="text-center">No hay menciones recientes</div>';
+                return;
+            }
+            
+            mentions.forEach(mention => {
+                const div = document.createElement('div');
+                div.className = 'whale-activity mb-2';
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>${mention.text}</span>
+                        <span class="badge bg-${mention.sentiment === 'positive' ? 'success' : mention.sentiment === 'negative' ? 'danger' : 'warning'}">${mention.sentiment}</span>
+                    </div>
+                    <small class="text-muted">${new Date(mention.timestamp).toLocaleString()}</small>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Actualizar lista de señales
+        function updateSignalsList(signals) {
+            const container = document.getElementById('signalsList');
+            container.innerHTML = '';
+            
+            if (signals.length === 0) {
+                container.innerHTML = '<div class="text-center">No hay señales recientes</div>';
+                return;
+            }
+            
+            signals.forEach(signal => {
+                const div = document.createElement('div');
+                div.className = `signal-card signal-${signal.action.toLowerCase()} mb-2`;
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${signal.asset}</strong> - ${signal.action.toUpperCase()}
+                            <br><small>${signal.reason}</small>
+                        </div>
+                        <div class="text-end">
+                            <div>$${signal.price}</div>
+                            <small>${new Date(signal.timestamp).toLocaleString()}</small>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Actualizar tabla de posiciones
+        function updatePositionsTable(positions) {
+            const tbody = document.getElementById('positionsTable');
+            tbody.innerHTML = '';
+            
+            if (positions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay posiciones activas</td></tr>';
+                return;
+            }
+            
+            positions.forEach(position => {
+                const row = document.createElement('tr');
+                const pnlClass = position.pnl >= 0 ? 'text-success' : 'text-danger';
+                row.innerHTML = `
+                    <td>${position.asset}</td>
+                    <td><span class="badge bg-${position.type === 'long' ? 'success' : 'danger'}">${position.type.toUpperCase()}</span></td>
+                    <td>${position.quantity}</td>
+                    <td>$${position.entryPrice}</td>
+                    <td>$${position.currentPrice}</td>
+                    <td class="${pnlClass}">$${position.pnl}</td>
+                    <td class="${pnlClass}">${position.pnlPercent}%</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="closePosition('${position.id}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Iniciar trading
+        function startTrading() {
+            const asset = document.getElementById('tradingAsset').value;
+            const interval = document.getElementById('tradingInterval').value;
+            
+            if (!isTradingActive) {
+                isTradingActive = true;
+                document.querySelector('#trading-tab button').innerHTML = '<i class="fas fa-stop me-2"></i>Detener Trading';
+                showAlert('Trading iniciado para ' + asset, 'success');
+            } else {
+                isTradingActive = false;
+                document.querySelector('#trading-tab button').innerHTML = '<i class="fas fa-play me-2"></i>Iniciar Trading';
+                showAlert('Trading detenido', 'warning');
+            }
+        }
+
+        // Guardar configuración de Binance
+        async function saveBinanceConfig() {
+            const apiKey = document.getElementById('binanceApiKey').value;
+            const secretKey = document.getElementById('binanceSecretKey').value;
+            const testnet = document.getElementById('binanceTestnet').checked;
+            
+            if (!apiKey || !secretKey) {
+                showAlert('Por favor completa todos los campos', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/config/binance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        api_key: apiKey,
+                        secret_key: secretKey,
+                        testnet: testnet
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('Configuración de Binance guardada exitosamente', 'success');
+                } else {
+                    showAlert('Error guardando configuración', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error guardando configuración: ' + error.message, 'danger');
+            }
+        }
+
+        // Guardar configuración del sistema
+        async function saveSystemConfig() {
+            const updateInterval = document.getElementById('updateInterval').value;
+            const maxPositions = document.getElementById('maxPositions').value;
+            const autoTrading = document.getElementById('autoTrading').checked;
+            
+            try {
+                const response = await fetch('/api/config/system', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        update_interval: parseInt(updateInterval),
+                        max_positions: parseInt(maxPositions),
+                        auto_trading: autoTrading
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('Configuración del sistema guardada exitosamente', 'success');
+                    updateInterval = parseInt(updateInterval) * 1000;
+                } else {
+                    showAlert('Error guardando configuración', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error guardando configuración: ' + error.message, 'danger');
+            }
+        }
+
+        // Cerrar posición
+        async function closePosition(positionId) {
+            if (confirm('¿Estás seguro de que quieres cerrar esta posición?')) {
+                try {
+                    const response = await fetch(`/api/positions/${positionId}/close`, {
+                        method: 'POST'
+                    });
+                    
+                    if (response.ok) {
+                        showAlert('Posición cerrada exitosamente', 'success');
+                        loadPositionsData();
+                    } else {
+                        showAlert('Error cerrando posición', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Error cerrando posición: ' + error.message, 'danger');
+                }
+            }
+        }
+
+        // Actualizar datos automáticamente
+        function startAutoUpdate() {
+            setInterval(() => {
+                if (isTradingActive) {
+                    loadInitialData();
+                }
+            }, updateInterval);
+        }
+
+        // Refrescar datos
+        function refreshData() {
+            loadInitialData();
+        }
+
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-custom alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.querySelector('.dashboard-container').insertBefore(alertDiv, document.querySelector('.container-fluid'));
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

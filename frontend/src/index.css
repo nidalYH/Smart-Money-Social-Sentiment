@@ -1,0 +1,198 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f0f2f5;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.ant-layout {
+  min-height: 100vh;
+}
+
+.dashboard-card {
+  margin-bottom: 16px;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 16px;
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.metric-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-running {
+  background-color: #52c41a;
+}
+
+.status-stopped {
+  background-color: #ff4d4f;
+}
+
+.status-warning {
+  background-color: #faad14;
+}
+
+.signal-card {
+  margin-bottom: 16px;
+}
+
+.signal-type-early-accumulation {
+  border-left: 4px solid #52c41a;
+}
+
+.signal-type-momentum-build {
+  border-left: 4px solid #1890ff;
+}
+
+.signal-type-fomo-warning {
+  border-left: 4px solid #ff4d4f;
+}
+
+.signal-type-contrarian-play {
+  border-left: 4px solid #722ed1;
+}
+
+.confidence-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.confidence-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.confidence-high {
+  background-color: #52c41a;
+}
+
+.confidence-medium {
+  background-color: #faad14;
+}
+
+.confidence-low {
+  background-color: #ff4d4f;
+}
+
+.whale-activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.whale-activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.sentiment-positive {
+  color: #52c41a;
+}
+
+.sentiment-negative {
+  color: #ff4d4f;
+}
+
+.sentiment-neutral {
+  color: #666;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.error-message {
+  text-align: center;
+  color: #ff4d4f;
+  padding: 20px;
+}
+
+.realtime-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.realtime-dot {
+  width: 6px;
+  height: 6px;
+  background-color: #52c41a;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .metric-value {
+    font-size: 20px;
+  }
+  
+  .activity-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+

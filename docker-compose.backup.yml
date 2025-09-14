@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backup:
+    image: postgres:15-alpine
+    container_name: backup
+    environment:
+      - POSTGRES_DB=smartmoney_backup
+      - POSTGRES_USER=backup_user
+      - POSTGRES_PASSWORD=backup_password
+    volumes:
+      - ./backups:/backups
+      - ./backup_script.sh:/backup_script.sh
+    command: /backup_script.sh
+    restart: unless-stopped
+
+  s3-backup:
+    image: amazon/aws-cli:latest
+    container_name: s3-backup
+    environment:
+      - AWS_ACCESS_KEY_ID=your_access_key
+      - AWS_SECRET_ACCESS_KEY=your_secret_key
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - ./backups:/backups
+      - ./s3_backup_script.sh:/s3_backup_script.sh
+    command: /s3_backup_script.sh
+    restart: unless-stopped
+
+  gcs-backup:
+    image: google/cloud-sdk:latest
+    container_name: gcs-backup
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/credentials.json
+    volumes:
+      - ./backups:/backups
+      - ./credentials.json:/credentials.json
+      - ./gcs_backup_script.sh:/gcs_backup_script.sh
+    command: /gcs_backup_script.sh
+    restart: unless-stopped

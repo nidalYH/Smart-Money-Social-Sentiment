@@ -1,0 +1,61 @@
+# Smart Money Trading System - Testing Configuration
+
+version: '3.8'
+
+services:
+  smartmoney-test:
+    build: .
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./smartmoney_test.db
+      - REDIS_URL=redis://redis:6379
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+      - TEST_MODE=true
+      - MOCK_DATA=true
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_test_data:/data
+    restart: unless-stopped
+
+  postgres-test:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=smartmoney_test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  test-runner:
+    build: .
+    command: python -m pytest tests/ -v --cov=app --cov-report=html
+    environment:
+      - DATABASE_URL=sqlite:///./smartmoney_test.db
+      - REDIS_URL=redis://redis:6379
+      - TEST_MODE=true
+    volumes:
+      - .:/app
+      - ./coverage:/app/coverage
+    depends_on:
+      - smartmoney-test
+      - redis
+    restart: "no"
+
+volumes:
+  redis_test_data:
+  postgres_test_data:

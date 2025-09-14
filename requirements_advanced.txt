@@ -1,0 +1,91 @@
+# Core dependencies
+fastapi==0.104.1
+uvicorn==0.24.0
+pydantic==2.5.1
+pydantic-settings==2.10.1
+python-multipart==0.0.6
+aiohttp==3.9.1
+asyncio-mqtt==0.16.1
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.1
+sqlite3
+
+# Machine Learning
+scikit-learn==1.3.2
+numpy==1.24.4
+pandas==2.1.4
+joblib==1.3.2
+
+# Technical Analysis
+ta-lib==0.4.28
+talib-binary==0.4.19
+
+# Data processing
+requests==2.31.0
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Cryptocurrency APIs
+ccxt==4.1.77
+python-binance==1.0.19
+
+# Notifications
+python-telegram-bot==20.7
+discord.py==2.3.2
+smtplib
+
+# Utilities
+python-dotenv==1.0.0
+schedule==1.2.0
+psutil==5.9.6
+tqdm==4.66.1
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Monitoring
+prometheus-client==0.19.0
+grafana-api==1.0.3
+
+# Security
+cryptography==41.0.8
+pyjwt==2.8.0
+
+# WebSocket support
+websockets==12.0
+
+# Redis (optional)
+redis==5.0.1
+hiredis==2.2.3
+
+# Additional ML libraries
+xgboost==2.0.2
+lightgbm==4.1.0
+catboost==1.2.2
+
+# Time series analysis
+statsmodels==0.14.0
+arch==6.2.0
+
+# Visualization (optional)
+matplotlib==3.8.2
+plotly==5.17.0
+seaborn==0.13.0
+
+# Configuration
+pyyaml==6.0.1
+toml==0.10.2
+
+# Logging
+structlog==23.2.0
+colorlog==6.8.0
+
+# Testing
+pytest-cov==4.1.0
+pytest-mock==3.12.0

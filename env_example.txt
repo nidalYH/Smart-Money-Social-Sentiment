@@ -1,0 +1,28 @@
+# Configuración de Binance
+BINANCE_API_KEY=tu_api_key_aqui
+BINANCE_SECRET_KEY=tu_secret_key_aqui
+BINANCE_TESTNET=true
+
+# Configuración de la base de datos
+DATABASE_URL=sqlite:///./smartmoney.db
+
+# Configuración de Redis (opcional)
+REDIS_URL=redis://localhost:6379
+
+# Configuración de Twitter (opcional)
+TWITTER_API_KEY=tu_twitter_api_key
+TWITTER_API_SECRET=tu_twitter_api_secret
+TWITTER_ACCESS_TOKEN=tu_twitter_access_token
+TWITTER_ACCESS_TOKEN_SECRET=tu_twitter_access_token_secret
+
+# Configuración de Telegram (opcional)
+TELEGRAM_BOT_TOKEN=tu_telegram_bot_token
+TELEGRAM_CHAT_ID=tu_telegram_chat_id
+
+# Configuración de Discord (opcional)
+DISCORD_WEBHOOK_URL=tu_discord_webhook_url
+
+# Configuración del servidor
+HOST=0.0.0.0
+PORT=8000
+DEBUG=true
